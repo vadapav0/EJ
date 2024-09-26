@@ -1,0 +1,56 @@
+----------INDEX.HTML-------------
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Simple Calculator</title>
+    </head>
+    <body>
+        <form method="POST" action="CalcServlet1"> 
+            Number1 : <input type="text" name="t1" required> <br>
+            Number2 : <input type="text" name="t2" required> <br>
+            <input type="submit" value="+" name="btn">
+            <input type="submit" value="-" name="btn">
+            <input type="submit" value="/" name="btn">
+            <input type="submit" value="*" name="btn">
+        </form>
+    </body>
+</html>
+
+
+----------CalcServlet------------
+
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "CalcServlet1", urlPatterns = ("/CalcServlet1"))
+
+public class CalcServlet1 extends HttpServlet {
+
+    public void doPost(HttpServletRequest req, HttpServletResponse res) throws
+            ServletException, IOException {
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+        int a = Integer.parseInt(req.getParameter("t1"));
+        int b = Integer.parseInt(req.getParameter("t2"));
+        String op = req.getParameter("btn");
+        int c = 0;
+        if (op.equals("+")) {
+            c = a + b;
+        } else if (op.equals("-")) {
+            c = a - b;
+        } else if (op.equals("*")) {
+            c = a * b;
+        } else if (op.equals("/")) {
+            if (b != 0) {
+                c = a / b;
+            } else {
+                out.print("<b>Error: Division by zero is not allowed.</b>");
+                return;  
+            }
+        }
+        out.print("The answer is " + c + "</b>");
+    }
+}
