@@ -1,0 +1,110 @@
+--------------INDEX.JSP-------------
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Non-Blocking Page</title>
+    </head>
+    <body>
+        <a href="NonBlockingServlet">Non-Blocking</a>
+    </body>
+</html>
+
+
+---------------NONBLOCKINGSERVLET-------------
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+public class NonBlockingServlet extends HttpServlet {
+    protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+        String filename = "C:\\Users\\TAUSEEF\\Desktop\\hello.txt"; // Update this path
+
+        InputStream is = new FileInputStream(new File(filename));
+        
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(isr);
+        String path = "http://" + req.getServerName() + ":" + req.getServerPort() + req.getContextPath() + "/ReadingNonBlockingServlet";
+        
+        out.println("<h1>FileReader/</h1>");
+        URL url = new URL(path);
+        HttpURLConnection hc = (HttpURLConnection) url.openConnection();
+        hc.setChunkedStreamingMode(2);
+        hc.setDoOutput(true);
+        hc.connect();
+        
+        String text;
+        out.println("Reading Started ...");
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(hc.getOutputStream()));
+        
+        while ((text = br.readLine()) != null) {
+            bw.write(text);
+            bw.flush();
+            out.println(text + "<br>");
+            out.flush();
+            try {
+                Thread.sleep(1000);  // Simulate delay for each line read
+            } catch (InterruptedException ex) {
+                out.print("Error during sleep: " + ex.getMessage());
+            }
+        }
+        
+        bw.write("Reading Completed");
+        bw.flush();
+        bw.close();
+        br.close();
+    }
+}
+
+---------------------READINGLISTENER---------------
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.ServletInputStream;
+
+public class ReadingListener implements ReadListener {
+    ServletInputStream input;
+    AsyncContext ac;
+
+    ReadingListener(ServletInputStream in, AsyncContext context) {
+        this.input = in;
+        this.ac = context;
+    }
+
+    @Override
+    public void onDataAvailable() throws IOException {
+        // Implement data handling logic here if necessary
+    }
+
+    @Override
+    public void onAllDataRead() {
+        ac.complete();  // Complete the async context when all data is read
+    }
+
+    @Override
+    public void onError(Throwable t) {
+        ac.complete();
+        t.printStackTrace();  // Handle error
+    }
+}
+
+
+---------------------READINGNONBLOCKINGSERVLET--------------------
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+@WebServlet(name = "ReadingNonBlockingServlet", urlPatterns = {"/ReadingNonBlockingServlet"}, asyncSupported = true)
+public class ReadingNonBlockingServlet extends HttpServlet {
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        res.setContentType("text/html");
+        AsyncContext ac = req.startAsync();
+        ServletInputStream in = req.getInputStream();
+        in.setReadListener(new ReadingListener(in, ac));
+    }
+}
