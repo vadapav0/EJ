@@ -1,3 +1,8 @@
+Step 1 : Create a session bean named as CCBean in the package named mybeans. Select the
+option Stateless and click on Local Interface. Here you will find two files created in the mybeans
+package named as CCBean.java and CCBeanLocal.java
+Step 2: Create a Servlet file name CCServlet in the package mypack.
+
 ------------INDEX.HTML--------------
 <html>
     <head>
