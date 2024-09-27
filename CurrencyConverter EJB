@@ -1,0 +1,80 @@
+------------INDEX.HTML--------------
+<html>
+    <head>
+        <title>Currency Converter</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="CCServlet">
+            Enter Amount: <input type="text" name="amt"><br>
+            Select Conversion Type<br>
+            <input type="Radio" name="type" value="r2d" checked>Rupee to Dollar
+            <input type="Radio" name="type" value="d2r">Dollar to Rupee<br>
+            <input type="Reset"><br><input type="submit" value="Convert">
+        </form>
+    </body>
+</html>
+
+---------------CCSERVLET---------------
+package mypack;
+import java.io.*;
+import javax.ejb.EJB;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import mybeans.CCBeanLocal;
+
+public class CCServlet extends HttpServlet {
+
+    @EJB
+    CCBeanLocal obj;
+
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws
+            ServletException, IOException {
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+        double amt = Double.parseDouble(req.getParameter("amt"));
+        if (req.getParameter("type").equals("r2d")) {
+            out.println("<h1>" + amt + " Rupee= " + obj.r2Dollar(amt) + " Dollar</h1>");
+        }
+        if (req.getParameter("type").equals("d2r")) {
+            out.println("<h1>" + amt + " Dollar= " + obj.d2Rupee(amt) + " Rupee</h1>");
+        }
+
+    }
+}
+
+
+================MYBEANS=================
+--------------CCBEANS(SESSION)------------
+package mybeans;
+
+import javax.ejb.Stateless;
+
+@Stateless
+public class CCBean implements CCBeanLocal {
+
+    @Override
+    public double r2Dollar(double r) {
+        return r / 65.65;
+    }
+
+    @Override
+    public double d2Rupee(double d) {
+        return d * 65.65;
+    }
+}
+
+-------------CCBEAONLOCAL---------------
+package mybeans;
+
+import javax.ejb.Local;
+
+@Local
+public interface CCBeanLocal {
+
+    public double r2Dollar(double r);
+
+    public double d2Rupee(double d);
+}
