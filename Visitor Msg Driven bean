@@ -1,0 +1,109 @@
+----------------INDEX.JSP--------------
+<%@page import="javax.jms.*"%>
+<%@page import="javax.naming.InitialContext"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<%!
+    private static ConnectionFactory connectionFactory;
+    private static Queue queue;
+    Connection connection = null;
+    Session mySession = null;
+    MessageProducer messageProducer = null;
+    TextMessage message = null;
+%>
+<html>
+    <head><title>Visitor Tracking</title></head>
+    <body>
+        Welcome to My Home Page
+        <%
+            try {
+                InitialContext ic = new InitialContext();
+                queue = (Queue) ic.lookup("jms/Queue");
+                connectionFactory = (ConnectionFactory) ic.lookup("jms/QueueFactory");
+                connection = connectionFactory.createConnection();
+                mySession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                messageProducer = mySession.createProducer(queue);
+                message = mySession.createTextMessage();
+                message.setText(request.getRemoteAddr());
+                messageProducer.send(message);
+            } catch (JMSException e) {
+                System.out.println("JMS Error: " + e.getMessage());
+            } finally {
+                if (connection != null) connection.close();
+            }
+        %>
+    </body>
+</html>
+
+
+---------------------BASICMESSAGEBEAN-------------------
+package ejb;
+import javax.annotation.Resource;
+import javax.ejb.*;
+import javax.jms.*;
+
+@MessageDriven(activationConfig = {
+    @ActivationConfigProperty(propertyName = "destinationLookup", propertyValue = "jms/Queue"),
+    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue")
+})
+public class BasicMessageBean implements MessageListener {
+    @EJB VisitStatBean vs;
+    @Resource private MessageDrivenContext mdc;
+
+    @Override
+    public void onMessage(Message message) {
+        try {
+            if (message instanceof TextMessage) {
+                TextMessage msg = (TextMessage) message;
+                vs.addVisitor(msg.getText());
+            }
+        } catch (JMSException e) {
+            mdc.setRollbackOnly();
+        }
+    }
+}
+
+
+--------------------VISISTATBEAN----------------------
+package ejb;
+import java.sql.*;
+import javax.ejb.Stateless;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+@Stateless
+public class VisitStatBean {
+    private Connection conn;
+    private Statement st;
+
+    @PostConstruct
+    public void connect() {
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/Practicaltest", "root", "admin123");
+        } catch (Exception e) {
+            System.err.println("Connection Error: " + e.getMessage());
+        }
+    }
+
+    @PreDestroy
+    public void disconnect() {
+        try { if (conn != null) conn.close(); }
+        catch (Exception e) { System.err.println("Disconnection Error: " + e.getMessage()); }
+    }
+
+    public void addVisitor(String host) {
+        try {
+            st = conn.createStatement();
+            String query = "INSERT INTO userstat (hostname, visits) VALUES ('" + host + "', 1)";
+            st.executeUpdate(query);
+        } catch (SQLException e) {
+            try {
+                st.executeUpdate("UPDATE userstat SET visits = visits + 1 WHERE hostname = '" + host + "'");
+            } catch (SQLException ex) {
+                System.err.println("Update Error: " + ex.getMessage());
+            }
+        }
+    }
+}
+
