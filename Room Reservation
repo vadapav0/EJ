@@ -1,0 +1,142 @@
+----------INDEX.HTML----------
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Room Reservation System</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="RoomClient" method="post">
+            <br> No of Rooms <input type="text" name="t1">
+            <br> <input type="submit" name="btn" value="CheckIN">
+            <br> <input type="submit" name="btn" value="CheckOUT">
+        </form>
+    </body>
+</html>
+
+
+--------------ROOMCLIENT(SERVLET)----------------
+package mypack;
+
+import ejb.RoomBeanLocal;
+import java.io.*;
+import javax.ejb.EJB;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+@WebServlet(name = "RoomClient", urlPatterns = {"/RoomClient"})
+public class RoomClient extends HttpServlet {
+
+    @EJB
+    RoomBeanLocal obj;
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws
+            ServletException, IOException {
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+        try {
+            int no = Integer.parseInt(req.getParameter("t1"));
+            String b = req.getParameter("btn");
+            int rse = 0;
+            if (b.equals("CheckIN")) {
+                rse = obj.checkin(no);
+                if (rse == 1) {
+                    out.println(no + " rooms check-in");
+                }
+            }
+            if (b.equals("CheckOUT")) {
+                rse = obj.checkout(no);
+                if (rse == 1) {
+                    out.println(no + "rooms check-out");
+                }
+            }
+            if (rse == 0) {
+                out.println("not Possible to do Check In/Out");
+                out.println("<br><br><a href=index.html> Back </a>");
+            }
+        } finally {
+            out.close();
+        }
+    }
+}
+
+
+===================EJB=====================
+----------------ROOMBEAN(SESSION)------------------
+package ejb;
+
+import java.sql.*;
+import javax.ejb.Stateless;
+
+@Stateless
+public class RoomBean implements RoomBeanLocal {
+
+    @Override
+    public int checkin(int no) {
+        try {
+           Class.forName("org.apache.derby.jdbc.ClientDriver");
+                Connection con = DriverManager.getConnection("jdbc:derby://localhost:1527/Practicaltest", "root", "admin123");
+            String sql1 = "select * from room";
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql1);
+            rs.next();
+            int total = rs.getInt(1);
+            int occ = rs.getInt(2);
+            int free = total - occ;
+            System.out.println(total);
+            System.out.println(free);
+            if (free >= no) {
+                String sql2 = "update room set occ=?";
+                PreparedStatement ps = con.prepareStatement(sql2);
+                ps.setInt(1, occ + no);
+                int rse = ps.executeUpdate();
+                return rse;
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    @Override
+    public int checkout(int no) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con
+                    = DriverManager.getConnection("jdbc:mysql://localhost/roomdb", "root", "tiger");
+            String sql1 = "select * from room";
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql1);
+            rs.next();
+            int total = rs.getInt(1);
+            int occ = rs.getInt(2);
+            if (occ >= 0) {
+                String sql2 = "update room set occ=?";
+                PreparedStatement ps = con.prepareStatement(sql2);
+                ps.setInt(1, occ - no);
+                int rse = ps.executeUpdate();
+                return rse;
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+}
+----------------ROOMBEANLOCAL----------------------
+package ejb;
+
+import javax.ejb.Local;
+
+@Local
+public interface RoomBeanLocal {
+
+    public int checkin(int no);
+
+    public int checkout(int no);
+}
