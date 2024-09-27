@@ -1,0 +1,116 @@
+---------INDEX.JSP----------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+        <h3>welcome to index page</h3>
+        <%session.setAttribute("user", "Admin");%>
+        <%Cookie ck = new Cookie("name", "mycookie");response.addCookie(ck);%>
+        <form action="ExpressionLanguage.jsp">
+            Enter Name:<input type="text" name="name" /><br/><br/>
+            <input type="submit" value="Submit"/>
+        </form>
+    </body>
+</html>
+
+------------EXPRESSIONLANGUAGE.JSP--------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        Welcome, ${ param.name }
+        Session Value is ${ sessionScope.user }
+        Cookie name is , ${cookie.name.value}
+    </body>
+</html>
+
+------------ELARITHEMETICOPERATOR.JSP--------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <%-- arithmetic op --%>
+        5*5+4: ${5*5+4} <br>
+        1.4E4+1.4: ${1.4E4+1.4}<br>
+        10 mod 4: ${10 mod 4}<br>
+        15 div 3: ${15 div 3}<br>
+    </body>
+</html>
+
+-------------ELCONDITIONALOPERATOR.JSP---------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h2>Conditional Operator</h2>
+        The result of 10>2 is: "${(10>1)?'greater':'lesser'}"
+    </body
+</html>
+
+--------------ELLOGICALOPERATOR.JSP----------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <%-- LogicalOperator --%>
+        <h2>Logical Operator</h2>
+        true and true: ${true and true}<br>
+        true && false: ${true && false}<br>
+        true or true: ${true or true}<br>
+        true || false: ${true || false}<br>
+        not true: ${not true}<br>
+        !false: ${!false}
+    </body>
+</html>
+
+---------------ELRELATIONALOPERATOR.JSP---------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta httpp-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head
+    <body>
+        <%-- RelationalOperator --%>
+        <h2>Relational Operator</h2>
+        10.0==10: ${10.0==10} <br>
+        10.0 eq 10: ${10.0 eq 10} <br>
+        ((20*10)!= 200): ${((20*10)!= 200)} <br>
+        3 ne 3: ${3 ne 3} <br>
+        3.2>=2: ${3.2>=2} <br>
+        3.2 ge 2: ${3.2 ge 2} <br>
+        2<3: ${2<3} <br>
+        4 lt 6: ${4 lt 6} <br>
+        2 <= 4: ${2 <= 4} <br>
+        4 le 2: ${4 le 2}
+    </body>
+</html>
+
+--------------EMPTY.JSP---------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <H1>Empty Operator Example</H1>
+        The Value for the Empty operator is:: ${empty "txxt"}
+    </body>
+</html>
