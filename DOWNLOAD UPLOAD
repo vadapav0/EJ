@@ -1,0 +1,193 @@
+--------------UPLOAD.JSP-------------
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>upload</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="UploadServlet" method="post" enctype="multipart/form-data">
+            Select file to upload: <input type="file" name="f1">
+            Destination: <input type="text" name="destination">
+            <br>
+            <input type="submit" value="Upload File" name="Upload">
+        </form> 
+            
+    </body>
+</html>
+
+
+---------------UPLOADSERVLET---------------
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.*;
+
+/**
+ * Servlet to handle file uploads.
+ */
+@MultipartConfig
+public class UploadServlet extends HttpServlet {
+
+    // Processes both GET and POST requests.
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet UploadServlet</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet UploadServlet at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        res.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = res.getWriter();
+        String path = req.getParameter("destination");
+        Part filePart = req.getPart("f1");
+        String filename = getFileName(filePart);
+        if (filename == null || filename.isEmpty()) {
+            out.println("<br>No file selected for upload.");
+            return;
+        }
+        out.println("<br>File Name: " + filename);
+
+        File file = new File(path + File.separator + filename);
+        try (InputStream fileContent = filePart.getInputStream();
+             OutputStream os = new FileOutputStream(file)) {
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fileContent.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+
+            out.println("<br>File uploaded successfully to: " + file.getAbsolutePath());
+        } catch (FileNotFoundException e) {
+            out.println("<br>Error: " + e.getMessage());
+        } finally {
+            out.close();
+        }
+    }
+
+    private String getFileName(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        if (contentDisposition != null) {
+            for (String token : contentDisposition.split(";")) {
+                if (token.trim().startsWith("filename")) {
+                    return token.substring(token.indexOf('=') + 1).trim().replace("\"", "");
+                }
+            }
+        }
+        return null;
+    }
+    @Override
+    public String getServletInfo() {
+        return "UploadServlet handles file upload functionality.";
+    }
+}
+
+
+----------DOWNLOAD.JSP-------------
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>File Download App</title> 
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h1>File Download App</h1>
+        <p>Click on the links below to download the files:</p>
+        <a href="DownloadServlet?filename=hello.txt">Download Sample Chapter (Text File)</a>
+    </body>
+</html>
+
+
+----------------DOWNLOADSERVLET-------------
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+/**
+ * Servlet to handle file download requests.
+ */
+public class DownloadServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        
+        // Get the requested filename from the query parameter
+        String filename = req.getParameter("filename");
+
+        if (filename == null || filename.isEmpty()) {
+            res.setContentType("text/html");
+            res.getWriter().println("File name is missing!");
+            return;
+        }
+
+        // Construct the full path to the file on the desktop
+        String desktopPath = "C:\\Users\\TAUSEEF\\Desktop\\" + filename;
+
+        // Alternatively, using File.separator for platform independence:
+        // String desktopPath = "C:" + File.separator + "Users" + File.separator + "Sukhbinder-2" + File.separator + "Desktop" + File.separator + filename;
+
+        File file = new File(desktopPath);
+
+        if (!file.exists()) {
+            res.setContentType("text/html");
+            res.getWriter().println("File not found!");
+            return;
+        }
+
+        // Set the response content type and headers for file download
+        res.setContentType("APPLICATION/OCTET-STREAM");
+        res.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+
+        // Prepare streams to read the file and send it to the client
+        try (InputStream inputStream = new FileInputStream(file);
+             ServletOutputStream outputStream = res.getOutputStream()) {
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            res.setContentType("text/html");
+            res.getWriter().println("Error in file download: " + e.getMessage());
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        doGet(req, res); // Delegate to doGet
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "DownloadServlet handles file download requests.";
+    }
+}
