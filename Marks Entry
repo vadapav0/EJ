@@ -1,0 +1,88 @@
+----------------INDEX.JSP-----------------
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Marks Entry</title>
+    </head>
+    <body>
+        <h2>Enter Student Marks</h2>
+        <form action="MarksEntry" method="post">
+            Enter student's name: <input type="text" name="sname" required /><br>
+            Enter subject 1 marks: <input type="number" name="m1" required /><br>
+            Enter subject 2 marks: <input type="number" name="m2" required /><br>
+            Enter subject 3 marks: <input type="number" name="m3" required /><br>
+            <input type="submit" value="Insert Marks" />
+        </form>
+    </body>
+</html>
+
+--------------------MARKSENTRYSERVLET-----------------
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/MarksEntry")
+public class MarksEntry extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        // Retrieve data from the form
+        String sname = request.getParameter("sname");
+        String m1 = request.getParameter("m1");
+        String m2 = request.getParameter("m2");
+        String m3 = request.getParameter("m3");
+
+        Connection con = null;
+        Statement st = null;
+
+        // Database connection variables
+        String url = "jdbc:derby://localhost:1527/Practicaltest";
+        String user = "root";
+        String password = "admin123";
+        
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        try {
+            // Load the Derby JDBC driver
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+
+            // Establish connection to the database
+            con = DriverManager.getConnection(url, user, password);
+            st = con.createStatement();
+            
+            // SQL query to insert data into the student table
+            String query = "INSERT INTO student (sname, marks1, marks2, marks3) VALUES ('" + sname + "', '" + m1 + "', '" + m2 + "', '" + m3 + "')";
+
+            // Execute the insert query
+            int result = st.executeUpdate(query);
+
+            if (result > 0) {
+                out.println("<h3>Marks inserted successfully!</h3>");
+            } else {
+                out.println("<h3>Error inserting marks!</h3>");
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            out.println("<h3>Error: " + e.getMessage() + "</h3>");
+        } finally {
+            try {
+                // Close resources
+                if (st != null) st.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                out.println("<h3>Error closing resources: " + e.getMessage() + "</h3>");
+            }
+        }
+    }
+}
