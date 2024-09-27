@@ -1,3 +1,7 @@
+Step 1: Java Web-> web application -> Pract7AServletHitsSingltonApp -> finish.
+Step2: Create a Session Bean named as CountServletHitsBean→ Select Singleton →
+package name as ejb (do not select Local or Remote)
+Step 3: Create a Servlet File name ServletClient in the package name as servlet.
 --------------COUNTSERVLETHITSBEAN(SESSION)--------------
 package ejb;
 
