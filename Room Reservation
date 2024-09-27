@@ -1,3 +1,9 @@
+Step 1: Create a session bean named as RoomBean in the package named ejb. Select the option
+Stateless and click on Local Interface. Here you will find two files created in the ejb package
+named as RoomBean.java and RoomBeanLocal.java
+Step 2: Create a Servlet file named as RoomClient. Do not click on web.xml (Deployment
+Descriptor)
+
 ----------INDEX.HTML----------
 <!DOCTYPE html>
 <html>
