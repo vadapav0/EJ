@@ -1,0 +1,53 @@
+-------------INDEX.HTML--------------
+<html>
+    <body>
+        <form action="UpdateEmp.jsp" method="post">
+            Enter Employee Number: <input type="text" name="txtEno"><br>
+            Enter Salary to update: <input type="text" name="txtSal"><br>
+            <input type="reset"><input type="submit">
+        </form>
+    </body>
+</html>
+
+-------------UPDATEEMP.JSP------------
+<%@page contentType="text/html" import="java.sql.*" %>
+<html>
+    <body>
+        <h1>Updating Employee Record</h1>
+        <%
+            String eno = request.getParameter("txtEno");
+            String sal = request.getParameter("txtSal");
+            Connection con = null;
+            PreparedStatement stmt = null;
+            try {
+                Class.forName("org.apache.derby.jdbc.ClientDriver");
+                con = DriverManager.getConnection("jdbc:derby://localhost:1527/Practicaltest", "root", "admin123");
+                stmt = con.prepareStatement("select * from emp where eno=?");
+                stmt.setString(1, eno);
+                ResultSet rs = stmt.executeQuery();
+                
+                if (rs.next()) {
+                    out.println("<h1>Employee " + rs.getString("ename") + " Exists</h1>");
+                    
+                    PreparedStatement pst = con.prepareStatement("update emp set salary=? where eno=?");
+                    pst.setString(1, sal);
+                    pst.setString(2, eno);
+                    int updated = pst.executeUpdate();
+                    
+                    if (updated > 0) {
+                        out.println("<h1>Employee Record updated successfully!</h1>");
+                    } else {
+                        out.println("<h1>Employee Record update failed!</h1>");
+                    }
+                } else {
+                    out.println("<h1>Employee Record does not exist!</h1>");
+                }
+            } catch (Exception e) {
+                out.println("Error: " + e);
+            } finally {
+                if (stmt != null) stmt.close();
+                if (con != null) con.close();
+            }
+        %>
+    </body>
+</html>
