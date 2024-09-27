@@ -1,0 +1,136 @@
+----------------INDEX.JSP----------------
+<html>
+<head>
+    <title>Guest Book</title>
+</head>
+<body>
+    Guest Book <hr><br><br>
+    <form action="guestbookview.jsp">
+        Name: <input type="text" name="name" maxlength="20"><br>
+        Message: <textarea rows="5" cols="40" maxlength="100" name="msg"></textarea><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+
+
+---------------GUESTBOOKVIEW.JSP--------------------
+<%@page import="org.hibernate.SessionFactory"%>
+<%@page import="org.hibernate.Session"%>
+<%@page import="org.hibernate.cfg.Configuration"%>
+<%@page import="org.hibernate.Transaction"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.Iterator"%>
+<%@page import="hibernate.Guestbook"%> <!-- Corrected Import -->
+<%!
+    SessionFactory sf;
+    org.hibernate.Session ss;
+    List<hibernate.Guestbook> gbook;
+%>
+<%
+    sf = new Configuration().configure().buildSessionFactory();
+    ss = sf.openSession();
+    Transaction tx = null;
+    Guestbook gb = new Guestbook();  <!-- Corrected Class Name -->
+    
+    try {
+        tx = ss.beginTransaction();
+        String name = request.getParameter("name");
+        String msg = request.getParameter("msg");
+        String dt = new java.util.Date().toString();
+
+        gb.setName(name);
+        gb.setMsg(msg);
+        gb.setDt(dt);
+        
+        ss.save(gb);
+        tx.commit();
+    } catch (Exception e) {
+        if (tx != null) tx.rollback();  // Rollback in case of error
+        out.println("Error: " + e.getMessage());
+    }
+
+    // Retrieving all guestbook entries
+    try {
+        tx = ss.beginTransaction();  // New transaction for the query
+        gbook = ss.createQuery("from Guestbook").list();
+        tx.commit();
+    } catch (Exception e) {
+        if (tx != null) tx.rollback(); // Rollback in case of error
+        out.println("Error: " + e.getMessage());
+        gbook = new ArrayList<>(); // Initialize an empty list to avoid NullPointerException
+    } finally {
+        ss.close(); // Close the session to prevent memory leaks
+    }
+%>
+<html>
+    <head>
+        <title>Guest View</title>
+    </head>
+    <body>
+        Guest View
+        Click here to go <a href="index.jsp"> BACK </a><br><br>
+        <% 
+            if (gbook != null) {
+                Iterator it = gbook.iterator();
+                while (it.hasNext()) {
+                    Guestbook eachrecord = (Guestbook) it.next();  <!-- Corrected Class Name -->
+                    out.print(eachrecord.getDt() + " ");
+                    out.print(eachrecord.getName() + "<br>");
+                    out.print(eachrecord.getMsg() + "<br><hr>");
+                }
+            }
+        %>
+    </body>
+</html>
+
+
+---------------------GUESTBOOK.JAVA(HIBERNATE)---------------
+public class Guestbook implements java.io.Serializable {
+
+    private Integer no;
+    private String name;
+    private String msg;
+    private String dt;
+
+    public Guestbook() {
+    }
+
+    public Guestbook(String name, String msg, String dt) {
+        this.name = name;
+        this.msg = msg;
+        this.dt = dt;
+    }
+
+    public Integer getNo() {
+        return this.no;
+    }
+
+    public void setNo(Integer no) {
+        this.no = no;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getMsg() {
+        return this.msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public String getDt() {
+        return this.dt;
+    }
+
+    public void setDt(String dt) {
+        this.dt = dt;
+    }
+}
