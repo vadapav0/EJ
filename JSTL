@@ -1,0 +1,139 @@
+----------INDEX.HTML---------
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>JSP Page</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <a href="SetDemo.jsp">SetDemo</a><br>
+        <a href="MaxIF.jsp">MaxIF</a><br>
+        <a href="ForEachDemo.jsp">ForEachDemo</a><br>
+        <a href="OutDemo.jsp">OutDemo</a><br>
+        <a href="URLDemo.jsp">URLDemo</a><br>
+        <a href="Choose_When_Otherwise.jsp">Choose_When_Otherwise</a><br>
+    </body>
+</html>
+
+-------------CHOOSE_WHEN_OTHERWISE.JSP--------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+        <c:set var="income" value="${4000*4}"/>
+        Your Income is: <c:out value="${income}"/>
+        <c:choose>
+            <c:when test="${income<=1000}">
+                Income is not good
+            </c:when>
+            <c:when test="${income > 10000}">
+                Income is very good
+            </c:when>
+            <c:otherwise>
+                Income is undetermined
+            </c:otherwise>
+        </c:choose>
+    </body>
+</html>
+
+--------------FOREACHDEMO.JSP--------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+    <c:forEach begin="1" end="10" var="i">
+        The Square of <c:out value="${i}=${i*i}"/><br>
+    </c:forEach>
+</body>
+</html>
+
+------------IFDEMO.JSP-------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+    <c:set var="x" value="${param.x}" />
+    <c:set var="y" value="${param.y}" />
+    <c:if test="${x>y}">
+        <font color="blue"><h2>The Ans is:</h2></font>
+        <c:out value="${x}is greater than${y}" />
+    </c:if>
+</body>
+</html>
+
+-----------MAXIF.JSP--------------
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form action="IFDemo.jsp">
+            x=<input type="text" name="x" /><br>
+            y=<input type="text" name="y" /><br>
+            <input type="submit" value="Check Max" />
+        </form>
+    </body>
+</html>
+
+------------OUTDEMO.JSP---------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+    <c:set var="name" value="Jhon"/>
+    My name is: <c:out value="${name}"/>
+</body>
+</html>
+
+--------------SETDEMO.JSP------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+    <c:set var="pageTitle" scope="application"
+           value="Dukes Soccer Premier League:Registartion"/>
+    ${pageTitle}
+</body>
+</html>
+
+-------------URLDEMO.JSP--------------
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+    <c:url value="/index.html"/>
+</body>
+</html>
