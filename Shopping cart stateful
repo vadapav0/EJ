@@ -1,3 +1,14 @@
+Step 1: creating application File -> new project-> java web->web application -> 
+Prac6CShoppingCartApp -> select Use dedicated folder for storing libraries -> finish
+Step 2: Creating a stateful session bean Source package -> new -> other -> enterprise java beans -
+> session bean -> next -> new session bean -> ejb name: ->ShoppingCart -> package: -> ejb -> 
+session type option -> Stateful -> finish.
+Step 3: creating a web client using index.jsp Right click on wewb pages -> new -> JSP -> filename -> 
+index -> finish.
+Step 4: Create database and database table Services -> create database -> cartdb ->select cartdb -
+> right click -> create table -> cart -> UserName varchar 35 ItemName varchar 50 Finish.
+Step 5. Add mysql connector to the library under project tab.
+Step 6: build and run the application
 ---------Index.jsp--------------
 <%@page import="java.util.Iterator, java.util.List, javax.naming.InitialContext, 
 ejb.ShoppingCart"%>
