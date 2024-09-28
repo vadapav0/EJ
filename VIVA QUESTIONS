@@ -1,0 +1,39 @@
+1. JSP (JavaServer Pages):
+JSP is a server-side technology used to create dynamic web content. It allows embedding Java code in HTML using special tags. It’s compiled into a servlet and executed on the server, generating HTML for the client.
+
+2. Servlet:
+Servlets are Java programs that run on a web server, handling client requests (like HTTP GET and POST). They are used to build dynamic web applications by interacting with databases, processing input, and generating responses.
+
+3. EJB (Enterprise JavaBeans):
+EJB is a server-side component architecture for building scalable, transactional, and secure enterprise-level applications. It simplifies the development of large-scale business logic components.
+
+ 4. Types in EJB:
+Session Beans: Handle business logic (Stateless, Stateful, Singleton).
+Entity Beans: Manage persistent data (deprecated in favor of JPA).
+Message-Driven Beans (MDB): Handle asynchronous messages from Java Message Service (JMS).
+5. Request Dispatcher:
+Used to forward a request to another resource (like another servlet or JSP) or to include the content of another resource in the response. This allows for modular web application design.
+
+6. Cookies:
+Small pieces of data stored on the client side, sent to the server with each request. Cookies help maintain state, such as user preferences or session information.
+[09:13, 9/28/2024] Simonnn: 7. Session:
+A mechanism to store user-specific data across multiple requests within a single web interaction. It’s maintained by the server and can store user data like login information.
+
+8. JSTL (JavaServer Pages Standard Tag Library):
+A collection of tags used in JSP to simplify common tasks like loops, conditionals, XML processing, and SQL queries. It reduces the need to write Java code directly in JSP.
+
+9. JDBC (Java Database Connectivity):
+An API in Java to interact with relational databases. JDBC allows executing SQL queries and retrieving results from a database, enabling database-driven Java applications.
+[09:13, 9/28/2024] Simonnn: 10. JDBC Drivers (4 Types):
+Type 1: JDBC-ODBC bridge (deprecated).
+Type 2: Native-API driver (partly platform-dependent).
+Type 3: Network Protocol driver (middleware-based).
+Type 4: Thin driver (pure Java, database-specific).
+11. Hibernate:
+An ORM (Object-Relational Mapping) framework in Java that simplifies database interactions by mapping Java objects to database tables. It reduces the need for explicit SQL queries and handles persistence.
+
+12. Apache Tomcat:
+An open-source web server and servlet container for deploying Java Servlets and JSPs. It serves as a lightweight, efficient platform for web application hosting.
+
+13. GlassFish:
+An open-source application server that supports the full Java EE platform, including technologies like EJB, JSP, Servlets, and JMS. It’s used for deploying enterprise Java applications.
